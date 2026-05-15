@@ -1,0 +1,49 @@
+{
+  "rules": [
+    {
+      "name": "ssh_brute_force",
+      "description": "5+ failed SSH logins dari IP yang sama dalam 60 detik",
+      "severity": "CRITICAL",
+      "conditions": {
+        "source": "auth",
+        "action": "failed_login",
+        "status": "FAILED",
+        "rate": {
+          "threshold": 5,
+          "window_seconds": 60
+        }
+      }
+    },
+    {
+      "name": "invalid_user_attempt",
+      "description": "Login dengan username yang tidak ada",
+      "severity": "WARNING",
+      "conditions": {
+        "source": "auth",
+        "action": "invalid_user"
+      }
+    },
+    {
+      "name": "http_server_error",
+      "description": "HTTP 5xx dari web server",
+      "severity": "CRITICAL",
+      "conditions": {
+        "source": "access",
+        "status": "500"
+      }
+    },
+    {
+      "name": "http_not_found_scan",
+      "description": "Banyak request 404 (kemungkinan scanning)",
+      "severity": "WARNING",
+      "conditions": {
+        "source": "access",
+        "status": "404",
+        "rate": {
+          "threshold": 10,
+          "window_seconds": 30
+        }
+      }
+    }
+  ]
+}

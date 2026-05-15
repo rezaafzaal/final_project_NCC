@@ -1,0 +1,15 @@
+services:
+  siem:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - LOG_SOURCE=both           # ubah ke "file" atau "generator" sesuai kebutuhan
+      - GENERATOR_INTERVAL=2.0
+      - LOG_FILE_AUTH=/app/logs/auth.log
+      - LOG_FILE_ACCESS=/app/logs/access.log
+    volumes:
+      - ./backend/logs:/app/logs  # mount log asli dari host (opsional)
+    restart: unless-stopped

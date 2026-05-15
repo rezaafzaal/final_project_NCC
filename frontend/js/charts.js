@@ -1,0 +1,61 @@
+let severityChart, timelineChart;
+const timelineData = { labels: [], info: [], warning: [], critical: [] };
+
+function initCharts() {
+  const severityCtx = document.getElementById('chart-severity').getContext('2d');
+  severityChart = new Chart(severityCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['INFO', 'WARNING', 'CRITICAL'],
+      datasets: [{
+        data: [0, 0, 0],
+        backgroundColor: ['#3b82f6', '#f59e0b', '#ef4444'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      plugins: { legend: { labels: { color: '#e2e8f0' } } },
+      cutout: '65%',
+    }
+  });
+
+  const timelineCtx = document.getElementById('chart-timeline').getContext('2d');
+  timelineChart = new Chart(timelineCtx, {
+    type: 'line',
+    data: {
+      labels: timelineData.labels,
+      datasets: [
+        { label: 'INFO',     data: timelineData.info,     borderColor: '#3b82f6', tension: 0.3, fill: false },
+        { label: 'WARNING',  data: timelineData.warning,  borderColor: '#f59e0b', tension: 0.3, fill: false },
+        { label: 'CRITICAL', data: timelineData.critical, borderColor: '#ef4444', tension: 0.3, fill: false },
+      ]
+    },
+    options: {
+      plugins: { legend: { labels: { color: '#e2e8f0' } } },
+      scales: {
+        x: { ticks: { color: '#64748b' }, grid: { color: '#2a2d3a' } },
+        y: { ticks: { color: '#64748b' }, grid: { color: '#2a2d3a' }, beginAtZero: true },
+      }
+    }
+  });
+}
+
+function updateSeverityChart(info, warning, critical) {
+  severityChart.data.datasets[0].data = [info, warning, critical];
+  severityChart.update('none');
+}
+
+function pushTimelinePoint(severity) {
+  const label = new Date().toLocaleTimeString();
+  if (timelineData.labels.length >= 20) {
+    timelineData.labels.shift();
+    timelineData.info.shift();
+    timelineData.warning.shift();
+    timelineData.critical.shift();
+  }
+  timelineData.labels.push(label);
+  timelineData.info.push(severity === 'INFO' ? 1 : 0);
+  timelineData.warning.push(severity === 'WARNING' ? 1 : 0);
+  timelineData.critical.push(severity === 'CRITICAL' ? 1 : 0);
+  timelineChart.update('none');
+}

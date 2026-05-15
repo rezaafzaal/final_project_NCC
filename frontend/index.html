@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEM Dashboard Kelompok 4</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <script src="/js/chart.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="header-left">
+        <div class="logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#060b14" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/>
+          </svg>
+        </div>
+        <div class="header-title">
+          <h1>SIEM Dashboard</h1>
+          <span>Kelompok 4 &mdash; Security Monitoring</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <span id="clock">--:--:--</span>
+        <div class="live-indicator">
+          <div class="live-dot" id="live-dot"></div>
+          <span id="ws-status" class="badge badge-disconnected">Offline</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Stat Cards -->
+      <section class="stats-grid">
+        <div class="card stat-card total">
+          <div class="stat-label">Total Events</div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-sub">semua event tercatat</div>
+        </div>
+        <div class="card stat-card info">
+          <div class="stat-label">Info</div>
+          <div class="stat-value" id="stat-info">0</div>
+          <div class="stat-sub">aktivitas normal</div>
+        </div>
+        <div class="card stat-card warning">
+          <div class="stat-label">Warning</div>
+          <div class="stat-value" id="stat-warning">0</div>
+          <div class="stat-sub">perlu diperhatikan</div>
+        </div>
+        <div class="card stat-card critical">
+          <div class="stat-label">Critical</div>
+          <div class="stat-value" id="stat-critical">0</div>
+          <div class="stat-sub">ancaman terdeteksi</div>
+        </div>
+      </section>
+
+      <!-- Charts -->
+      <section class="charts-grid">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-dot"></div>
+            <h2>Severity Distribution</h2>
+          </div>
+          <canvas id="chart-severity"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-dot"></div>
+            <h2>Events Over Time</h2>
+          </div>
+          <canvas id="chart-timeline"></canvas>
+        </div>
+      </section>
+
+      <!-- Log Source Input -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-dot"></div>
+          <h2>Log Source</h2>
+        </div>
+        <div class="input-row">
+          <input
+            type="text"
+            id="log-path-input"
+            placeholder="/var/log/auth.log"
+          />
+          <select id="log-source-select">
+            <option value="auth">Auth Log</option>
+            <option value="access">Access Log</option>
+          </select>
+          <button onclick="applyLogPath()">Apply</button>
+        </div>
+        <div id="log-path-msg" style="margin-top:8px;font-size:12px;"></div>
+      </section>
+
+      <!-- Live Events -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-dot"></div>
+          <h2>Live Events</h2>
+        </div>
+        <div class="filter-row">
+          <select id="filter-severity" onchange="applyFilter()">
+            <option value="">All Severity</option>
+            <option value="INFO">INFO</option>
+            <option value="WARNING">WARNING</option>
+            <option value="CRITICAL">CRITICAL</option>
+          </select>
+          <select id="filter-source" onchange="applyFilter()">
+            <option value="">All Source</option>
+            <option value="auth">Auth</option>
+            <option value="access">Access</option>
+          </select>
+          <button class="btn-ghost" onclick="clearEvents()">Clear</button>
+        </div>
+        <div class="table-wrapper">
+          <table id="events-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Source</th>
+                <th>IP Address</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Status</th>
+                <th>Severity</th>
+                <th>Rule Triggered</th>
+              </tr>
+            </thead>
+            <tbody id="events-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="/js/charts.js"></script>
+    <script src="/js/websocket.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script>
+      // Update jam di header
+      function updateClock() {
+        document.getElementById('clock').textContent = new Date().toLocaleTimeString('id-ID', { hour12: false });
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
+    </script>
+  </body>
+</html>
