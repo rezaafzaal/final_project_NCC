@@ -103,6 +103,12 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'env file', variable: 'ENV_FILE')]) {
                     sh '''
+                        docker run --rm \
+                          --user root \
+                          -v "$HOST_WORKSPACE":/workspace \
+                          -w /workspace \
+                          python:3.11-slim \
+                          sh -lc "rm -f .env"
                         cp "$ENV_FILE" .env
                         docker compose down || true
                         docker compose up -d
