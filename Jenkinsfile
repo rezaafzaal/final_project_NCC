@@ -113,6 +113,7 @@ pipeline {
                           sh -lc "rm -f .env"
                         cp "$ENV_FILE" .env
                         docker compose down || true
+                        docker rm -f fp-siem || true
                         docker compose up -d --build
                     '''
                 }
