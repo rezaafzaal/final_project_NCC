@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 import aiomysql
 import json
 import ssl
