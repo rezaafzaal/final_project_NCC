@@ -82,8 +82,22 @@ function clearEvents() {
   document.getElementById('events-body').innerHTML = '';
 }
 
-function applyLogPath() {
+async function applyLogPath() {
   const path = document.getElementById('log-path-input').value.trim();
+  const source = document.getElementById('log-source-select').value;
+  const msg = document.getElementById('log-path-msg');
   if (!path) return;
-  alert(`Path "${path}" akan diterapkan. Hubungkan fitur ini ke API backend untuk implementasi penuh.`);
+  try {
+    const res = await fetch('/api/config/log-path', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source, path }),
+    });
+    const data = await res.json();
+    msg.textContent = data.message;
+    msg.style.color = data.status === 'ok' ? '#4ade80' : '#f87171';
+  } catch {
+    msg.textContent = 'Gagal menghubungi server.';
+    msg.style.color = '#f87171';
+  }
 }

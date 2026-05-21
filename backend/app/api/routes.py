@@ -1,8 +1,10 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Query
+from pydantic import BaseModel
 from app.db.database import get_events, get_stats
 from app.core.rule_engine import RuleEngine
+from app.core.log_collector import update_log_path
 
 router = APIRouter()
 _rule_engine: RuleEngine | None = None
@@ -33,3 +35,16 @@ async def reload_rules():
     if _rule_engine:
         _rule_engine.reload_rules()
     return {"status": "rules reloaded"}
+
+
+class LogPathRequest(BaseModel):
+    source: str
+    path: str
+
+
+@router.post("/config/log-path")
+async def set_log_path(req: LogPathRequest):
+    if req.source not in ("auth", "access"):
+        return {"status": "error", "message": "source harus 'auth' atau 'access'"}
+    update_log_path(req.source, req.path)
+    return {"status": "ok", "message": f"Path {req.source} diupdate ke {req.path}"}
