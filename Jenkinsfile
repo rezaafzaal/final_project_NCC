@@ -17,9 +17,16 @@ pipeline {
             steps {
                 script {
                     docker.image('python:3.11-slim').inside {
-                        sh 'python -m pip install -r backend/requirements.txt'
-                        sh 'python -m pip install pytest pytest-asyncio httpx'
-                        sh 'pytest backend/tests/ -v --tb=short || true'
+                        withEnv([
+                            'HOME=/tmp',
+                            'PIP_CACHE_DIR=/tmp/pip-cache',
+                            'XDG_CACHE_HOME=/tmp/.cache'
+                        ]) {
+                            sh 'mkdir -p /tmp/pip-cache /tmp/.cache'
+                            sh 'python -m pip install -r backend/requirements.txt'
+                            sh 'python -m pip install pytest pytest-asyncio httpx'
+                            sh 'pytest backend/tests/ -v --tb=short || true'
+                        }
                     }
                 }
             }
