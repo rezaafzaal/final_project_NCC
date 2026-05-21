@@ -9,7 +9,6 @@ from app.config import (
     DB_NAME,
     DB_SSL,
     DB_SSL_CA,
-    DB_SSL_VERIFY,
 )
 
 _pool: aiomysql.Pool | None = None
@@ -24,9 +23,6 @@ async def _get_pool() -> aiomysql.Pool:
             ssl_context = ssl.create_default_context(
                 cafile=DB_SSL_CA or None
             )
-            if not DB_SSL_VERIFY:
-                ssl_context.check_hostname = False
-                ssl_context.verify_mode = ssl.CERT_NONE
 
         _pool = await aiomysql.create_pool(
             host=DB_HOST,

@@ -1,5 +1,7 @@
 import asyncio
 import os
+
+import aiofiles
 from app.config import LOG_SOURCE, LOG_FILE_AUTH, LOG_FILE_ACCESS, GENERATOR_INTERVAL
 from app.core.log_parser import parse_line
 from app.core.log_generator import generate_logs
@@ -9,10 +11,10 @@ async def _tail_file(path: str, source: str, queue: asyncio.Queue):
     """Baca log file dari akhir, terus pantau baris baru (seperti tail -f)."""
     if not os.path.exists(path):
         return
-    with open(path, "r") as f:
-        f.seek(0, 2)  # langsung ke akhir file
+    async with aiofiles.open(path, "r") as f:
+        await f.seek(0, 2)  # langsung ke akhir file
         while True:
-            line = f.readline()
+            line = await f.readline()
             if line:
                 event = parse_line(line, source)
                 if event:

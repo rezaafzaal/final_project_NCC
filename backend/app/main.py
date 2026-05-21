@@ -27,8 +27,11 @@ async def lifespan(app: FastAPI):
             _process_queue(queue, rule_engine),
         )
 
-    asyncio.create_task(pipeline())
-    yield
+    app.state.pipeline_task = asyncio.create_task(pipeline())
+    try:
+        yield
+    finally:
+        app.state.pipeline_task.cancel()
 
 
 async def _process_queue(queue: asyncio.Queue, rule_engine: RuleEngine):

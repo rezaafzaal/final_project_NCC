@@ -16,6 +16,5 @@ DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 DB_NAME     = os.getenv("DB_NAME",     "siem")
 DB_SSL      = os.getenv("DB_SSL",      "false").lower() == "true"
 DB_SSL_CA   = os.getenv("DB_SSL_CA",   "")
-DB_SSL_VERIFY = os.getenv("DB_SSL_VERIFY", "true").lower() == "true"
 
 RULES_PATH = os.getenv("RULES_PATH", "/app/rules/default_rules.json")
