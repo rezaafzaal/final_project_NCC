@@ -67,6 +67,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
+                sh 'rm -rf .pytest_cache || true'
                 withSonarQubeEnv("${SONARQUBE_ENV}") {
                     sh """
                         ${SCANNER_HOME}/bin/sonar-scanner
