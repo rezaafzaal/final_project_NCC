@@ -1,9 +1,11 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Query
 from app.db.database import get_events, get_stats
 from app.core.rule_engine import RuleEngine
 
 router = APIRouter()
-_rule_engine: RuleEngine = None
+_rule_engine: RuleEngine | None = None
 
 
 def set_rule_engine(engine: RuleEngine):
@@ -13,9 +15,9 @@ def set_rule_engine(engine: RuleEngine):
 
 @router.get("/events")
 async def list_events(
-    limit: int = Query(100, ge=1, le=1000),
-    severity: str = Query(None),
-    source: str = Query(None),
+    limit: Annotated[int, Query(100, ge=1, le=1000)],
+    severity: Annotated[str | None, Query(None)],
+    source: Annotated[str | None, Query(None)],
 ):
     events = await get_events(limit=limit, severity=severity, source=source)
     return {"events": events}
