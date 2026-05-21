@@ -46,7 +46,7 @@ pipeline {
             }
         }
 
-        stage('Install') {
+        stage('Install & Test') {
             steps {
                 sh '''
                     docker run --rm \
@@ -59,23 +59,8 @@ pipeline {
                       python:3.11-slim \
                       sh -lc "mkdir -p /tmp/pip-cache /tmp/.cache && \
                              python -m pip install -r backend/requirements.txt && \
-                             python -m pip install pytest pytest-asyncio httpx"
-                '''
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh '''
-                    docker run --rm \
-                      --user root \
-                      -e HOME=/tmp \
-                      -e PIP_CACHE_DIR=/tmp/pip-cache \
-                      -e XDG_CACHE_HOME=/tmp/.cache \
-                      -v "$HOST_WORKSPACE":/workspace \
-                      -w /workspace \
-                      python:3.11-slim \
-                      sh -lc "python -m pytest backend/tests/ -v --tb=short || true"
+                             python -m pip install pytest pytest-asyncio httpx && \
+                             python -m pytest backend/tests/ -v --tb=short || true"
                 '''
             }
         }
