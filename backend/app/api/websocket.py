@@ -1,6 +1,7 @@
 import asyncio
 import json
 from fastapi import WebSocket, WebSocketDisconnect
+from app.metrics import active_websocket_connections
 
 
 class ConnectionManager:
@@ -10,9 +11,11 @@ class ConnectionManager:
     async def connect(self, ws: WebSocket):
         await ws.accept()
         self._clients.append(ws)
+        active_websocket_connections.inc()
 
     def disconnect(self, ws: WebSocket):
         self._clients.remove(ws)
+        active_websocket_connections.dec()
 
     async def broadcast(self, data: dict):
         message = json.dumps(data)
