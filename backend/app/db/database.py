@@ -54,7 +54,7 @@ async def init_db():
                     status        VARCHAR(16),
                     severity      VARCHAR(16)  DEFAULT 'INFO',
                     rule_triggered VARCHAR(64),
-                    extra         TEXT
+                    extra         TEXT NOT NULL
                 )
             """)
 
