@@ -5,3 +5,5 @@ __pycache__/
 siem.db
 *.db
 .pytest_cache/
+coverage.xml
+.coverage
