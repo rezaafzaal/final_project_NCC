@@ -11,6 +11,7 @@ from app.core.log_collector import start_collector
 from app.core.rule_engine import RuleEngine
 from app.db.database import init_db, save_event
 from app.metrics import events_total, rules_triggered_total
+from app.services.email_service import send_alert_email
 
 
 @asynccontextmanager
@@ -45,8 +46,12 @@ async def _process_queue(queue: asyncio.Queue, rule_engine: RuleEngine):
         await manager.broadcast(event.to_dict())
 
         events_total.labels(severity=event.severity, source=event.source).inc()
-        if event.rule_triggered:
+
+        if event.rule_triggered: #Prome
             rules_triggered_total.labels(rule=event.rule_triggered).inc()
+
+        if event.severity == "CRITICAL": #Events
+            asyncio.create_task(asyncio.to_thread(send_alert_email, event))
 
 
 app = FastAPI(title="SIEM Dashboard", lifespan=lifespan)
