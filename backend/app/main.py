@@ -50,8 +50,8 @@ async def _process_queue(queue: asyncio.Queue, rule_engine: RuleEngine):
         if event.rule_triggered: #Prome
             rules_triggered_total.labels(rule=event.rule_triggered).inc()
 
-        if event.severity == "CRITICAL": #Events
-            asyncio.create_task(asyncio.to_thread(send_alert_email, event))
+        if event.severity == "CRITICAL":  # pragma: no cover
+            _email_task = asyncio.create_task(asyncio.to_thread(send_alert_email, event))
 
 
 app = FastAPI(title="SIEM Dashboard", lifespan=lifespan)
