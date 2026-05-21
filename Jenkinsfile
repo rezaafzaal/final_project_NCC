@@ -59,8 +59,9 @@ pipeline {
                       python:3.11-slim \
                       sh -lc "mkdir -p /tmp/pip-cache /tmp/.cache && \
                              python -m pip install -r backend/requirements.txt && \
-                             python -m pip install pytest pytest-asyncio httpx && \
-                             python -m pytest backend/tests/ -v --tb=short -p no:cacheprovider || true"
+                             python -m pip install pytest pytest-asyncio httpx pytest-cov && \
+                             python -m pytest backend/tests/ -v --tb=short -p no:cacheprovider \
+                               --cov=backend/app --cov-report=xml:coverage.xml || true"
                 '''
             }
         }
