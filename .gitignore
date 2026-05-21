@@ -1,0 +1,7 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+siem.db
+*.db
+.pytest_cache/
