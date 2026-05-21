@@ -15,9 +15,13 @@ pipeline {
 
         stage('Install & Test') {
             steps {
-                sh 'python3 -m pip install -r backend/requirements.txt'
-                sh 'python3 -m pip install pytest pytest-asyncio httpx'
-                sh 'pytest backend/tests/ -v --tb=short || true'
+                script {
+                    docker.image('python:3.11-slim').inside {
+                        sh 'python -m pip install -r backend/requirements.txt'
+                        sh 'python -m pip install pytest pytest-asyncio httpx'
+                        sh 'pytest backend/tests/ -v --tb=short || true'
+                    }
+                }
             }
         }
 
