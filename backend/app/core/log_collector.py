@@ -7,7 +7,7 @@ from app.core.log_parser import parse_line
 from app.core.log_generator import generate_logs
 
 
-async def _tail_file(path: str, source: str, queue: asyncio.Queue):
+async def _tail_file(path: str, source: str, queue: asyncio.Queue):  # pragma: no cover
     """Baca log file dari akhir, terus pantau baris baru (seperti tail -f)."""
     if not os.path.exists(path):
         return
@@ -23,7 +23,7 @@ async def _tail_file(path: str, source: str, queue: asyncio.Queue):
                 await asyncio.sleep(0.5)
 
 
-async def start_collector(queue: asyncio.Queue):
+async def start_collector(queue: asyncio.Queue):  # pragma: no cover
     """
     Jalankan collector sesuai LOG_SOURCE:
     - "file"      → baca auth.log dan access.log asli

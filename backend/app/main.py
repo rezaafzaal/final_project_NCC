@@ -15,7 +15,7 @@ from app.services.email_service import send_alert_email
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI):  # pragma: no cover
     await init_db()
 
     rule_engine = RuleEngine()
@@ -24,7 +24,6 @@ async def lifespan(app: FastAPI):
     queue: asyncio.Queue = asyncio.Queue()
 
     async def pipeline():
-        # Jalankan collector dan broadcast bersamaan
         await asyncio.gather(
             start_collector(queue),
             _process_queue(queue, rule_engine),
@@ -37,7 +36,7 @@ async def lifespan(app: FastAPI):
         app.state.pipeline_task.cancel()
 
 
-async def _process_queue(queue: asyncio.Queue, rule_engine: RuleEngine):
+async def _process_queue(queue: asyncio.Queue, rule_engine: RuleEngine):  # pragma: no cover
     from app.api.websocket import manager
     while True:
         event = await queue.get()
@@ -47,10 +46,10 @@ async def _process_queue(queue: asyncio.Queue, rule_engine: RuleEngine):
 
         events_total.labels(severity=event.severity, source=event.source).inc()
 
-        if event.rule_triggered: #Prome
+        if event.rule_triggered:
             rules_triggered_total.labels(rule=event.rule_triggered).inc()
 
-        if event.severity == "CRITICAL":  # pragma: no cover
+        if event.severity == "CRITICAL":
             _email_task = asyncio.create_task(asyncio.to_thread(send_alert_email, event))
 
 

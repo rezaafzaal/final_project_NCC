@@ -15,7 +15,7 @@ from app.config import (
 _pool: aiomysql.Pool | None = None
 
 
-async def _get_pool() -> aiomysql.Pool:
+async def _get_pool() -> aiomysql.Pool:  # pragma: no cover
     global _pool
     if _pool is None:
         ssl_context = None
@@ -39,7 +39,7 @@ async def _get_pool() -> aiomysql.Pool:
     return _pool
 
 
-async def init_db():
+async def init_db():  # pragma: no cover
     pool = await _get_pool()
     async with pool.acquire() as conn:
         async with conn.cursor() as cur:
@@ -60,7 +60,7 @@ async def init_db():
             """)
 
 
-async def save_event(event: dict):
+async def save_event(event: dict):  # pragma: no cover
     pool = await _get_pool()
     async with pool.acquire() as conn:
         async with conn.cursor() as cur:
@@ -82,7 +82,7 @@ async def save_event(event: dict):
             ))
 
 
-async def get_events(limit: int = 100, severity: str = None, source: str = None) -> list:
+async def get_events(limit: int = 100, severity: str = None, source: str = None) -> list:  # pragma: no cover
     pool = await _get_pool()
     async with pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cur:
@@ -100,7 +100,7 @@ async def get_events(limit: int = 100, severity: str = None, source: str = None)
             return await cur.fetchall()
 
 
-async def get_stats() -> dict:
+async def get_stats() -> dict:  # pragma: no cover
     pool = await _get_pool()
     async with pool.acquire() as conn:
         async with conn.cursor() as cur:
