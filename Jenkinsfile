@@ -15,8 +15,8 @@ pipeline {
 
         stage('Install & Test') {
             steps {
-                sh 'pip install -r backend/requirements.txt'
-                sh 'pip install pytest pytest-asyncio httpx'
+                sh 'python3 -m pip install -r backend/requirements.txt'
+                sh 'python3 -m pip install pytest pytest-asyncio httpx'
                 sh 'pytest backend/tests/ -v --tb=short || true'
             }
         }
