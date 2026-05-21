@@ -60,14 +60,21 @@ pipeline {
                       sh -lc "mkdir -p /tmp/pip-cache /tmp/.cache && \
                              python -m pip install -r backend/requirements.txt && \
                              python -m pip install pytest pytest-asyncio httpx && \
-                             python -m pytest backend/tests/ -v --tb=short --cache-dir=/tmp/.pytest_cache || true"
+                             python -m pytest backend/tests/ -v --tb=short -p no:cacheprovider || true"
                 '''
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                sh 'rm -rf .pytest_cache || true'
+                sh '''
+                    docker run --rm \
+                      --user root \
+                      -v "$HOST_WORKSPACE":/workspace \
+                      -w /workspace \
+                      python:3.11-slim \
+                      sh -lc "rm -rf .pytest_cache"
+                '''
                 withSonarQubeEnv("${SONARQUBE_ENV}") {
                     sh """
                         ${SCANNER_HOME}/bin/sonar-scanner
