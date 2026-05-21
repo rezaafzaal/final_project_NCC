@@ -14,7 +14,7 @@ def set_rule_engine(engine: RuleEngine):
 
 
 @router.get("/events")
-async def list_events(  # pragma: no cover
+async def list_events(
     limit: Annotated[int, Query(ge=1, le=1000)] = 100,
     severity: Annotated[str | None, Query()] = None,
     source: Annotated[str | None, Query()] = None,
@@ -24,12 +24,12 @@ async def list_events(  # pragma: no cover
 
 
 @router.get("/stats")
-async def stats():  # pragma: no cover
+async def stats():
     return await get_stats()
 
 
 @router.post("/rules/reload")
-async def reload_rules():  # pragma: no cover
+async def reload_rules():
     if _rule_engine:
         _rule_engine.reload_rules()
     return {"status": "rules reloaded"}

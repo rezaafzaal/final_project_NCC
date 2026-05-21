@@ -4,7 +4,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from app.metrics import active_websocket_connections
 
 
-class ConnectionManager:  # pragma: no cover
+class ConnectionManager:
     def __init__(self):
         self._clients: list[WebSocket] = []
 
@@ -32,7 +32,7 @@ class ConnectionManager:  # pragma: no cover
 manager = ConnectionManager()
 
 
-async def ws_endpoint(websocket: WebSocket):  # pragma: no cover
+async def ws_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
@@ -42,7 +42,7 @@ async def ws_endpoint(websocket: WebSocket):  # pragma: no cover
         manager.disconnect(websocket)
 
 
-async def broadcast_loop(queue: asyncio.Queue):  # pragma: no cover
+async def broadcast_loop(queue: asyncio.Queue):
     """Ambil event dari queue, broadcast ke semua WebSocket client."""
     while True:
         event = await queue.get()

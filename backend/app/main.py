@@ -15,7 +15,7 @@ from app.services.email_service import send_alert_email
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):  # pragma: no cover
+async def lifespan(app: FastAPI):
     await init_db()
 
     rule_engine = RuleEngine()
@@ -36,7 +36,7 @@ async def lifespan(app: FastAPI):  # pragma: no cover
         app.state.pipeline_task.cancel()
 
 
-async def _process_queue(queue: asyncio.Queue, rule_engine: RuleEngine):  # pragma: no cover
+async def _process_queue(queue: asyncio.Queue, rule_engine: RuleEngine):
     from app.api.websocket import manager
     while True:
         event = await queue.get()
