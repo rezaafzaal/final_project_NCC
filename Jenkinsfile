@@ -101,11 +101,13 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh '''    
-                    docker compose down || true
-                    docker compose up -d
-                    fi
-                '''
+                withCredentials([file(credentialsId: 'env file', variable: 'ENV_FILE')]) {
+                    sh '''
+                        cp "$ENV_FILE" .env
+                        docker compose down || true
+                        docker compose up -d
+                    '''
+                }
             }
         }
     }
