@@ -15,9 +15,9 @@ def set_rule_engine(engine: RuleEngine):
 
 @router.get("/events")
 async def list_events(
-    limit: Annotated[int, Query(100, ge=1, le=1000)],
-    severity: Annotated[str | None, Query(None)],
-    source: Annotated[str | None, Query(None)],
+    limit: Annotated[int, Query(ge=1, le=1000)] = 100,
+    severity: Annotated[str | None, Query()] = None,
+    source: Annotated[str | None, Query()] = None,
 ):
     events = await get_events(limit=limit, severity=severity, source=source)
     return {"events": events}
