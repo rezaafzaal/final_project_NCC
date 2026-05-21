@@ -61,7 +61,8 @@ pipeline {
                              python -m pip install -r backend/requirements.txt && \
                              python -m pip install pytest pytest-asyncio httpx pytest-cov && \
                              python -m pytest backend/tests/ -v --tb=short -p no:cacheprovider \
-                               --cov=backend/app --cov-report=xml:coverage.xml || true"
+                               --cov=backend/app --cov-report=xml:coverage.xml || true && \
+                             sed -i 's|/workspace/||g' coverage.xml || true"
                 '''
             }
         }
