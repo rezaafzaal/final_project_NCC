@@ -9,5 +9,5 @@ services:
     env_file:
       - .env
     volumes:
-      - ./backend/logs:/app/logs  # mount log asli dari host (opsional)
+      - ./backend/logs:/app/logs
     restart: unless-stopped
