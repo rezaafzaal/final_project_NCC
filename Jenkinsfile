@@ -111,7 +111,7 @@ pipeline {
                           sh -lc "rm -f .env"
                         cp "$ENV_FILE" .env
                         docker compose down || true
-                        docker compose up -d
+                        docker compose up -d --build
                     '''
                 }
             }
