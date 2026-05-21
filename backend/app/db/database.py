@@ -1,6 +1,16 @@
 import aiomysql
 import json
-from app.config import DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_SSL
+import ssl
+from app.config import (
+    DB_HOST,
+    DB_PORT,
+    DB_USER,
+    DB_PASSWORD,
+    DB_NAME,
+    DB_SSL,
+    DB_SSL_CA,
+    DB_SSL_VERIFY,
+)
 
 _pool: aiomysql.Pool | None = None
 
@@ -8,6 +18,16 @@ _pool: aiomysql.Pool | None = None
 async def _get_pool() -> aiomysql.Pool:
     global _pool
     if _pool is None:
+        ssl_context = None
+        if DB_SSL:
+            # Use system CA bundle by default; allow custom CA via DB_SSL_CA.
+            ssl_context = ssl.create_default_context(
+                cafile=DB_SSL_CA or None
+            )
+            if not DB_SSL_VERIFY:
+                ssl_context.check_hostname = False
+                ssl_context.verify_mode = ssl.CERT_NONE
+
         _pool = await aiomysql.create_pool(
             host=DB_HOST,
             port=DB_PORT,
@@ -15,7 +35,7 @@ async def _get_pool() -> aiomysql.Pool:
             password=DB_PASSWORD,
             db=DB_NAME,
             autocommit=True,
-            ssl=DB_SSL or None,
+            ssl=ssl_context,
             minsize=1,
             maxsize=5,
         )
@@ -38,7 +58,7 @@ async def init_db():
                     status        VARCHAR(16),
                     severity      VARCHAR(16)  DEFAULT 'INFO',
                     rule_triggered VARCHAR(64),
-                    extra         TEXT         DEFAULT '{}'
+                    extra         TEXT
                 )
             """)
 
