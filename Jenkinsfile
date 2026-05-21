@@ -60,7 +60,7 @@ pipeline {
                       sh -lc "mkdir -p /tmp/pip-cache /tmp/.cache && \
                              python -m pip install -r backend/requirements.txt && \
                              python -m pip install pytest pytest-asyncio httpx && \
-                             python -m pytest backend/tests/ -v --tb=short || true"
+                             python -m pytest backend/tests/ -v --tb=short --cache-dir=/tmp/.pytest_cache || true"
                 '''
             }
         }
