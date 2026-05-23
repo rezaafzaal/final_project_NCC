@@ -5,6 +5,9 @@ LOG_SOURCE = os.getenv("LOG_SOURCE", "both")
 
 LOG_FILE_AUTH = os.getenv("LOG_FILE_AUTH", "/app/logs/auth.log")
 LOG_FILE_ACCESS = os.getenv("LOG_FILE_ACCESS", "/app/logs/access.log")
+LOG_FILE_FIREWALL = os.getenv("LOG_FILE_FIREWALL", "/app/logs/firewall.log")
+LOG_FILE_SYSLOG = os.getenv("LOG_FILE_SYSLOG", "/app/logs/syslog.log")
+LOG_FILE_FIM = os.getenv("LOG_FILE_FIM", "/app/logs/fim.log")
 
 GENERATOR_INTERVAL = float(os.getenv("GENERATOR_INTERVAL", "2.0"))  # detik antar log
 

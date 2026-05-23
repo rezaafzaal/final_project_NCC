@@ -6,7 +6,7 @@ from typing import Optional
 @dataclass
 class LogEvent:
     timestamp: datetime
-    source: str          # "auth" | "access"
+    source: str          # "auth" | "access" | "firewall" | "syslog" | "fim"
     raw: str             # baris log asli
     ip: Optional[str] = None
     user: Optional[str] = None

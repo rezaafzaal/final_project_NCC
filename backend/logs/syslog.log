@@ -1,0 +1,7 @@
+May 23 09:15:22 server sudo: ubuntu : TTY=pts/0 ; PWD=/home/ubuntu ; USER=root ; COMMAND=/bin/cat /etc/shadow
+May 23 09:16:00 server sudo: admin : authentication failure ; logname= ; uid=1000 ; euid=0 ; tty=/dev/pts/0 ; ruser=admin ; rhost= ; user=root
+May 23 09:20:00 server systemd[1]: Stopped nginx.service
+May 23 09:20:05 server systemd[1]: Started nginx.service
+May 23 09:25:10 server useradd[5432]: new user: name=deploy, UID=1001, GID=1001, home=/home/deploy, shell=/bin/bash
+May 23 09:30:00 server sudo: root : TTY=pts/1 ; PWD=/root ; USER=root ; COMMAND=/usr/sbin/useradd hacker
+May 23 09:35:00 server cron[2345]: (root) CMD (/usr/local/bin/cleanup.sh)

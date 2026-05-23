@@ -1,0 +1,6 @@
+2026-05-23T09:15:22+00:00 fim: action=modified path=/etc/passwd uid=0 gid=0 md5=abc123def456789012345678 sha256=abc123def456789012345678901234567890123456789012345678901234
+2026-05-23T09:16:00+00:00 fim: action=created path=/tmp/test.txt uid=1000 gid=1000 md5=def456abc789012345678901 sha256=def456abc789012345678901234567890123456789012345678901234567
+2026-05-23T09:20:00+00:00 fim: action=modified path=/etc/shadow uid=0 gid=0 md5=aaa111bbb222ccc333444555 sha256=aaa111bbb222ccc333444555666777888999000aaabbbcccdddeeefffggg
+2026-05-23T09:25:00+00:00 fim: action=deleted path=/var/log/auth.log uid=0 gid=0
+2026-05-23T09:30:00+00:00 fim: action=modified path=/usr/bin/sudo uid=0 gid=0 md5=eee555fff666ggg777hhh888 sha256=eee555fff666ggg777hhh888iii999jjj000kkklllmmmnnnooopppqqqrrr
+2026-05-23T09:35:00+00:00 fim: action=attributes_changed path=/home/user/.bashrc uid=1000 gid=1000 md5=hhh888iii999jjj000kkk111 sha256=hhh888iii999jjj000kkk111lll222mmm333nnn444ooo555ppp666qqq

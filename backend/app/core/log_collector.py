@@ -2,13 +2,20 @@ import asyncio
 import os
 
 import aiofiles
-from app.config import LOG_SOURCE, LOG_FILE_AUTH, LOG_FILE_ACCESS, GENERATOR_INTERVAL
+from app.config import (
+    LOG_SOURCE, LOG_FILE_AUTH, LOG_FILE_ACCESS,
+    LOG_FILE_FIREWALL, LOG_FILE_SYSLOG, LOG_FILE_FIM,
+    GENERATOR_INTERVAL,
+)
 from app.core.log_parser import parse_line
 from app.core.log_generator import generate_logs
 
 _log_paths: dict[str, str] = {
     "auth": LOG_FILE_AUTH,
     "access": LOG_FILE_ACCESS,
+    "firewall": LOG_FILE_FIREWALL,
+    "syslog": LOG_FILE_SYSLOG,
+    "fim": LOG_FILE_FIM,
 }
 
 
@@ -43,15 +50,15 @@ async def _tail_file(source: str, queue: asyncio.Queue):
 async def start_collector(queue: asyncio.Queue):
     """
     Jalankan collector sesuai LOG_SOURCE:
-    - "file"      → baca auth.log dan access.log asli
+    - "file"      → baca semua log file (auth, access, firewall, syslog, fim)
     - "generator" → generate log simulasi
     - "both"      → keduanya berjalan bersamaan
     """
     tasks = []
 
     if LOG_SOURCE in ("file", "both"):
-        tasks.append(asyncio.create_task(_tail_file("auth", queue)))
-        tasks.append(asyncio.create_task(_tail_file("access", queue)))
+        for source in _log_paths:
+            tasks.append(asyncio.create_task(_tail_file(source, queue)))
 
     if LOG_SOURCE in ("generator", "both"):
         tasks.append(asyncio.create_task(generate_logs(queue, GENERATOR_INTERVAL)))

@@ -1,9 +1,12 @@
 {
   "rules": [
     {
+      "rule_id": 5710,
       "name": "ssh_brute_force",
-      "description": "5+ failed SSH logins dari IP yang sama dalam 60 detik",
+      "description": "Multiple failed SSH login attempts from the same IP (possible brute force)",
       "severity": "CRITICAL",
+      "mitre_id": "T1110",
+      "mitre_tactic": "Credential Access",
       "conditions": {
         "source": "auth",
         "action": "failed_login",
@@ -15,27 +18,65 @@
       }
     },
     {
+      "rule_id": 5711,
       "name": "invalid_user_attempt",
-      "description": "Login dengan username yang tidak ada",
+      "description": "SSH login attempt with a non-existent username",
       "severity": "WARNING",
+      "mitre_id": "T1078",
+      "mitre_tactic": "Initial Access",
       "conditions": {
         "source": "auth",
         "action": "invalid_user"
       }
     },
     {
+      "rule_id": 5712,
+      "name": "root_login_success",
+      "description": "Successful root login detected (high-privilege access)",
+      "severity": "WARNING",
+      "mitre_id": "T1078.003",
+      "mitre_tactic": "Privilege Escalation",
+      "conditions": {
+        "source": "auth",
+        "action": "login",
+        "user": "root"
+      }
+    },
+    {
+      "rule_id": 5720,
+      "name": "ssh_login_outside_hours",
+      "description": "SSH login outside normal business hours (00:00-06:00)",
+      "severity": "WARNING",
+      "mitre_id": "T1078",
+      "mitre_tactic": "Initial Access",
+      "conditions": {
+        "source": "auth",
+        "action": "login",
+        "time_range": {
+          "start_hour": 0,
+          "end_hour": 6
+        }
+      }
+    },
+    {
+      "rule_id": 31100,
       "name": "http_server_error",
-      "description": "HTTP 5xx dari web server",
+      "description": "HTTP 5xx server error detected",
       "severity": "CRITICAL",
+      "mitre_id": "T1499",
+      "mitre_tactic": "Impact",
       "conditions": {
         "source": "access",
         "status": "500"
       }
     },
     {
+      "rule_id": 31101,
       "name": "http_not_found_scan",
-      "description": "Banyak request 404 (kemungkinan scanning)",
+      "description": "Multiple 404 requests indicating directory/path scanning",
       "severity": "WARNING",
+      "mitre_id": "T1595",
+      "mitre_tactic": "Reconnaissance",
       "conditions": {
         "source": "access",
         "status": "404",
@@ -43,6 +84,184 @@
           "threshold": 10,
           "window_seconds": 30
         }
+      }
+    },
+    {
+      "rule_id": 31103,
+      "name": "sql_injection_attempt",
+      "description": "SQL injection patterns detected in HTTP request",
+      "severity": "CRITICAL",
+      "mitre_id": "T1190",
+      "mitre_tactic": "Initial Access",
+      "conditions": {
+        "source": "access",
+        "action": "sql_injection"
+      }
+    },
+    {
+      "rule_id": 31104,
+      "name": "xss_attempt",
+      "description": "Cross-site scripting (XSS) patterns detected in HTTP request",
+      "severity": "CRITICAL",
+      "mitre_id": "T1189",
+      "mitre_tactic": "Initial Access",
+      "conditions": {
+        "source": "access",
+        "action": "xss_attempt"
+      }
+    },
+    {
+      "rule_id": 31105,
+      "name": "web_shell_access",
+      "description": "Access to known web shell paths detected",
+      "severity": "CRITICAL",
+      "mitre_id": "T1505.003",
+      "mitre_tactic": "Persistence",
+      "conditions": {
+        "source": "access",
+        "action": "web_shell"
+      }
+    },
+    {
+      "rule_id": 31110,
+      "name": "http_dos_flood",
+      "description": "Excessive HTTP requests from a single IP (possible DoS attack)",
+      "severity": "CRITICAL",
+      "mitre_id": "T1498",
+      "mitre_tactic": "Impact",
+      "conditions": {
+        "source": "access",
+        "rate": {
+          "threshold": 100,
+          "window_seconds": 10
+        }
+      }
+    },
+    {
+      "rule_id": 4100,
+      "name": "firewall_drop_flood",
+      "description": "High volume of firewall drops from a single IP (port scan or attack)",
+      "severity": "CRITICAL",
+      "mitre_id": "T1046",
+      "mitre_tactic": "Discovery",
+      "conditions": {
+        "source": "firewall",
+        "action": "DROP",
+        "rate": {
+          "threshold": 20,
+          "window_seconds": 30
+        }
+      }
+    },
+    {
+      "rule_id": 4101,
+      "name": "firewall_drop_single",
+      "description": "Firewall dropped an incoming connection",
+      "severity": "INFO",
+      "mitre_id": "T1046",
+      "mitre_tactic": "Discovery",
+      "conditions": {
+        "source": "firewall",
+        "action": "DROP"
+      }
+    },
+    {
+      "rule_id": 4102,
+      "name": "firewall_outbound_unusual_port",
+      "description": "Outbound connection to unusual port blocked by firewall",
+      "severity": "WARNING",
+      "mitre_id": "T1571",
+      "mitre_tactic": "Command and Control",
+      "conditions": {
+        "source": "firewall",
+        "action": "DROP",
+        "direction": "outbound"
+      }
+    },
+    {
+      "rule_id": 550,
+      "name": "fim_critical_file_modified",
+      "description": "Critical system file was modified (passwd, shadow, sudoers)",
+      "severity": "CRITICAL",
+      "mitre_id": "T1222",
+      "mitre_tactic": "Defense Evasion",
+      "conditions": {
+        "source": "fim",
+        "action": "modified",
+        "path_match": ["/etc/passwd", "/etc/shadow", "/etc/sudoers", "/etc/ssh/sshd_config"]
+      }
+    },
+    {
+      "rule_id": 551,
+      "name": "fim_file_deleted",
+      "description": "System file was deleted",
+      "severity": "WARNING",
+      "mitre_id": "T1070.004",
+      "mitre_tactic": "Defense Evasion",
+      "conditions": {
+        "source": "fim",
+        "action": "deleted"
+      }
+    },
+    {
+      "rule_id": 552,
+      "name": "fim_binary_modified",
+      "description": "System binary was modified (possible rootkit or trojan)",
+      "severity": "CRITICAL",
+      "mitre_id": "T1554",
+      "mitre_tactic": "Persistence",
+      "conditions": {
+        "source": "fim",
+        "action": "modified",
+        "path_match": ["/usr/bin/", "/usr/sbin/", "/bin/", "/sbin/"]
+      }
+    },
+    {
+      "rule_id": 5500,
+      "name": "privilege_escalation_sudo",
+      "description": "User executed command via sudo",
+      "severity": "INFO",
+      "mitre_id": "T1548.003",
+      "mitre_tactic": "Privilege Escalation",
+      "conditions": {
+        "source": "syslog",
+        "action": "sudo_command"
+      }
+    },
+    {
+      "rule_id": 5501,
+      "name": "sudo_failed",
+      "description": "Failed sudo attempt detected",
+      "severity": "WARNING",
+      "mitre_id": "T1548.003",
+      "mitre_tactic": "Privilege Escalation",
+      "conditions": {
+        "source": "syslog",
+        "action": "sudo_failed"
+      }
+    },
+    {
+      "rule_id": 5502,
+      "name": "service_stopped",
+      "description": "System service was stopped",
+      "severity": "WARNING",
+      "mitre_id": "T1489",
+      "mitre_tactic": "Impact",
+      "conditions": {
+        "source": "syslog",
+        "action": "service_stopped"
+      }
+    },
+    {
+      "rule_id": 5503,
+      "name": "user_added",
+      "description": "New user account was created on the system",
+      "severity": "WARNING",
+      "mitre_id": "T1136",
+      "mitre_tactic": "Persistence",
+      "conditions": {
+        "source": "syslog",
+        "action": "user_added"
       }
     }
   ]

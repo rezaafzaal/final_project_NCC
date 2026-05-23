@@ -39,6 +39,42 @@ class RuleEngine:
         if "status" in conditions and event.status != conditions["status"]:
             return False
 
+        # User match: e.g. root_login_success requires user == "root"
+        if "user" in conditions and event.user != conditions["user"]:
+            return False
+
+        # Direction match (for firewall rules): check extra.direction
+        if "direction" in conditions:
+            if event.extra.get("direction") != conditions["direction"]:
+                return False
+
+        # Path match: check if event path matches any prefix/exact in the list
+        if "path_match" in conditions:
+            event_path = event.extra.get("path", "")
+            if not event_path:
+                return False
+            matched = False
+            for pattern in conditions["path_match"]:
+                if event_path == pattern or event_path.startswith(pattern):
+                    matched = True
+                    break
+            if not matched:
+                return False
+
+        # Time range match: event timestamp must be within the given hour range
+        if "time_range" in conditions:
+            tr = conditions["time_range"]
+            hour = event.timestamp.hour
+            start_h = tr.get("start_hour", 0)
+            end_h = tr.get("end_hour", 6)
+            if start_h <= end_h:
+                if not (start_h <= hour < end_h):
+                    return False
+            else:
+                # Wraps around midnight, e.g. start=22, end=6
+                if not (hour >= start_h or hour < end_h):
+                    return False
+
         # Rate-based: misal "failed_login >= 5 kali dalam 60 detik dari IP yang sama"
         if "rate" in conditions:
             rate = conditions["rate"]

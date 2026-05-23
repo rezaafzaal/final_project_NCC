@@ -44,7 +44,7 @@ class LogPathRequest(BaseModel):
 
 @router.post("/config/log-path")
 async def set_log_path(req: LogPathRequest):
-    if req.source not in ("auth", "access"):
-        return {"status": "error", "message": "source harus 'auth' atau 'access'"}
+    if req.source not in ("auth", "access", "firewall", "syslog", "fim"):
+        return {"status": "error", "message": "source harus 'auth', 'access', 'firewall', 'syslog', atau 'fim'"}
     update_log_path(req.source, req.path)
     return {"status": "ok", "message": f"Path {req.source} diupdate ke {req.path}"}
