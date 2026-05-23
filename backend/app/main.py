@@ -3,12 +3,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
 from app.api.routes import router, set_rule_engine
 from app.api.websocket import ws_endpoint, broadcast_loop
 from app.core.log_collector import start_collector
 from app.core.rule_engine import RuleEngine
 from app.db.database import init_db, save_event
+from app.metrics import events_total, rules_triggered_total
 from app.services.discord_webhook import send_alert_dc
 
 
@@ -63,6 +65,10 @@ app.add_middleware(
 app.include_router(router, prefix="/api")
 
 app.add_websocket_route("/ws", ws_endpoint)
+
+@app.get("/metrics")
+def metrics():
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
 # Serve frontend static files
