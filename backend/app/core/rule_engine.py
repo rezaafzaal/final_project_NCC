@@ -13,6 +13,49 @@ def load_rules() -> list:
         return []
 
 
+def _check_basic_fields(conditions: dict, event: LogEvent) -> bool:
+    """Check simple equality conditions: source, action, status, user."""
+    if "source" in conditions and event.source != conditions["source"]:
+        return False
+    if "action" in conditions and event.action != conditions["action"]:
+        return False
+    if "status" in conditions and event.status != conditions["status"]:
+        return False
+    if "user" in conditions and event.user != conditions["user"]:
+        return False
+    if "direction" in conditions:
+        if event.extra.get("direction") != conditions["direction"]:
+            return False
+    return True
+
+
+def _check_path_match(conditions: dict, event: LogEvent) -> bool:
+    """Check if event path matches any prefix/exact pattern in path_match list."""
+    if "path_match" not in conditions:
+        return True
+    event_path = event.extra.get("path", "")
+    if not event_path:
+        return False
+    return any(
+        event_path == pattern or event_path.startswith(pattern)
+        for pattern in conditions["path_match"]
+    )
+
+
+def _check_time_range(conditions: dict, event: LogEvent) -> bool:
+    """Check if event timestamp falls within the specified hour range."""
+    if "time_range" not in conditions:
+        return True
+    tr = conditions["time_range"]
+    hour = event.timestamp.hour
+    start_h = tr.get("start_hour", 0)
+    end_h = tr.get("end_hour", 6)
+    if start_h <= end_h:
+        return start_h <= hour < end_h
+    # Wraps around midnight, e.g. start=22, end=6
+    return hour >= start_h or hour < end_h
+
+
 class RuleEngine:
     def __init__(self):
         self.rules = load_rules()
@@ -32,61 +75,28 @@ class RuleEngine:
     def _matches(self, rule: dict, event: LogEvent) -> bool:
         conditions = rule.get("conditions", {})
 
-        if "source" in conditions and event.source != conditions["source"]:
+        if not _check_basic_fields(conditions, event):
             return False
-        if "action" in conditions and event.action != conditions["action"]:
+        if not _check_path_match(conditions, event):
             return False
-        if "status" in conditions and event.status != conditions["status"]:
+        if not _check_time_range(conditions, event):
             return False
-
-        # User match: e.g. root_login_success requires user == "root"
-        if "user" in conditions and event.user != conditions["user"]:
+        if not self._check_rate(rule, conditions, event):
             return False
-
-        # Direction match (for firewall rules): check extra.direction
-        if "direction" in conditions:
-            if event.extra.get("direction") != conditions["direction"]:
-                return False
-
-        # Path match: check if event path matches any prefix/exact in the list
-        if "path_match" in conditions:
-            event_path = event.extra.get("path", "")
-            if not event_path:
-                return False
-            matched = False
-            for pattern in conditions["path_match"]:
-                if event_path == pattern or event_path.startswith(pattern):
-                    matched = True
-                    break
-            if not matched:
-                return False
-
-        # Time range match: event timestamp must be within the given hour range
-        if "time_range" in conditions:
-            tr = conditions["time_range"]
-            hour = event.timestamp.hour
-            start_h = tr.get("start_hour", 0)
-            end_h = tr.get("end_hour", 6)
-            if start_h <= end_h:
-                if not (start_h <= hour < end_h):
-                    return False
-            else:
-                # Wraps around midnight, e.g. start=22, end=6
-                if not (hour >= start_h or hour < end_h):
-                    return False
-
-        # Rate-based: misal "failed_login >= 5 kali dalam 60 detik dari IP yang sama"
-        if "rate" in conditions:
-            rate = conditions["rate"]
-            key = f"{rule['name']}:{event.ip}"
-            window = timedelta(seconds=rate.get("window_seconds", 60))
-            now = datetime.now()
-            dq = self._counters[key]
-            dq.append(now)
-            # buang timestamp yang sudah di luar window
-            while dq and dq[0] < now - window:
-                dq.popleft()
-            if len(dq) < rate.get("threshold", 5):
-                return False
 
         return True
+
+    def _check_rate(self, rule: dict, conditions: dict, event: LogEvent) -> bool:
+        """Check rate-based conditions (e.g. N events within M seconds from same IP)."""
+        if "rate" not in conditions:
+            return True
+        rate = conditions["rate"]
+        key = f"{rule['name']}:{event.ip}"
+        window = timedelta(seconds=rate.get("window_seconds", 60))
+        now = datetime.now()
+        dq = self._counters[key]
+        dq.append(now)
+        # buang timestamp yang sudah di luar window
+        while dq and dq[0] < now - window:
+            dq.popleft()
+        return len(dq) >= rate.get("threshold", 5)
