@@ -52,7 +52,20 @@ function initCharts() {
       ]
     },
     options: {
-      plugins: { legend: { labels: { color: '#e2e8f0' } } },
+      plugins: {
+        legend: { labels: { color: '#e2e8f0' } },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'x',
+          },
+          zoom: {
+            wheel: { enabled: true },
+            pinch: { enabled: true },
+            mode: 'x',
+          },
+        },
+      },
       scales: {
         x: { ticks: { color: '#64748b' }, grid: { color: '#2a2d3a' } },
         y: { ticks: { color: '#64748b' }, grid: { color: '#2a2d3a' }, beginAtZero: true },
