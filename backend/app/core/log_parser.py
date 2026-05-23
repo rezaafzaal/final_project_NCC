@@ -63,7 +63,7 @@ _SUDO_CMD = re.compile(
     rf"(?P<user>\S+)\s+:\s+{_SUDO_FIELDS[0]}=\S+\s+;\s+{_SUDO_FIELDS[1]}=\S+\s+;\s+{_SUDO_FIELDS[2]}=(?P<target_user>\S+)\s+;\s+{_SUDO_FIELDS[3]}=(?P<command>.+)"
 )
 _SUDO_FAILED_RE = re.compile(
-    r"(?P<user>\S+)\s+:\s+.*authentication failure"
+    r"(?P<user>\S+)\s+:\s+[^;]*authentication failure"
 )
 # These match against the message part only (program name is already parsed by _SYSLOG_PATTERN)
 _SERVICE_RE = re.compile(
