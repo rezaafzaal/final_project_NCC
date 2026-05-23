@@ -1,6 +1,29 @@
 let severityChart, timelineChart;
 const timelineData = { labels: [], info: [], warning: [], critical: [] };
 
+const BUCKET_INTERVAL = 30000; // 30 detik per bucket
+const MAX_BUCKETS = 30;        // 30 bucket × 30 detik = 15 menit
+
+let _bucket = { info: 0, warning: 0, critical: 0 };
+let _bucketLabel = '';
+let _bucketTimer = null;
+
+function _flushBucket() {
+  if (timelineData.labels.length >= MAX_BUCKETS) {
+    timelineData.labels.shift();
+    timelineData.info.shift();
+    timelineData.warning.shift();
+    timelineData.critical.shift();
+  }
+  timelineData.labels.push(_bucketLabel);
+  timelineData.info.push(_bucket.info);
+  timelineData.warning.push(_bucket.warning);
+  timelineData.critical.push(_bucket.critical);
+  timelineChart.update('none');
+  _bucket = { info: 0, warning: 0, critical: 0 };
+  _bucketLabel = new Date().toLocaleTimeString();
+}
+
 function initCharts() {
   const severityCtx = document.getElementById('chart-severity').getContext('2d');
   severityChart = new Chart(severityCtx, {
@@ -46,16 +69,11 @@ function updateSeverityChart(info, warning, critical) {
 }
 
 function pushTimelinePoint(severity) {
-  const label = new Date().toLocaleTimeString();
-  if (timelineData.labels.length >= 20) {
-    timelineData.labels.shift();
-    timelineData.info.shift();
-    timelineData.warning.shift();
-    timelineData.critical.shift();
+  const sev = severity.toLowerCase();
+  if (_bucket[sev] !== undefined) _bucket[sev]++;
+
+  if (!_bucketTimer) {
+    _bucketLabel = new Date().toLocaleTimeString();
+    _bucketTimer = setInterval(_flushBucket, BUCKET_INTERVAL);
   }
-  timelineData.labels.push(label);
-  timelineData.info.push(severity === 'INFO' ? 1 : 0);
-  timelineData.warning.push(severity === 'WARNING' ? 1 : 0);
-  timelineData.critical.push(severity === 'CRITICAL' ? 1 : 0);
-  timelineChart.update('none');
 }
