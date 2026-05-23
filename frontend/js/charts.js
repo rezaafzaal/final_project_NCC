@@ -1,27 +1,25 @@
 let severityChart, timelineChart;
 const timelineData = { labels: [], info: [], warning: [], critical: [] };
 
-const BUCKET_INTERVAL = 30000; // 30 detik per bucket
-const MAX_BUCKETS = 30;        // 30 bucket × 30 detik = 15 menit
+const BUCKET_INTERVAL = 10000; // 10 detik per bucket
+const MAX_BUCKETS = 90;        // 90 bucket × 10 detik = 15 menit
 
 let _bucket = { info: 0, warning: 0, critical: 0 };
-let _bucketLabel = '';
 let _bucketTimer = null;
 
-function _flushBucket() {
+function _addCurrentBucket() {
   if (timelineData.labels.length >= MAX_BUCKETS) {
     timelineData.labels.shift();
     timelineData.info.shift();
     timelineData.warning.shift();
     timelineData.critical.shift();
   }
-  timelineData.labels.push(_bucketLabel);
+  timelineData.labels.push(new Date().toLocaleTimeString());
   timelineData.info.push(_bucket.info);
   timelineData.warning.push(_bucket.warning);
   timelineData.critical.push(_bucket.critical);
-  timelineChart.update('none');
   _bucket = { info: 0, warning: 0, critical: 0 };
-  _bucketLabel = new Date().toLocaleTimeString();
+  timelineChart.update('none');
 }
 
 function initCharts() {
@@ -73,7 +71,7 @@ function pushTimelinePoint(severity) {
   if (_bucket[sev] !== undefined) _bucket[sev]++;
 
   if (!_bucketTimer) {
-    _bucketLabel = new Date().toLocaleTimeString();
-    _bucketTimer = setInterval(_flushBucket, BUCKET_INTERVAL);
+    _addCurrentBucket();
+    _bucketTimer = setInterval(_addCurrentBucket, BUCKET_INTERVAL);
   }
 }
