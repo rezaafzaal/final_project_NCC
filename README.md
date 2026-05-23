@@ -69,8 +69,17 @@ Project dianalisis menggunakan SonarQube dengan file `sonar-project.properties` 
 
 <img width="1892" height="868" alt="image" src="https://github.com/user-attachments/assets/16db275f-f9e7-48cd-9c33-c3fe66a09dc3" />
 
+### 8. Alerting System
+A. Custom SIEM Dashboard
+Alert diberikan menggunakan webhook ke discord ketika terjadi event dengan severity CRITICAL
 
-### 8. Deployment
+B. Grafana Dashboard
+Alert diberikan menggunakan webhook ke discord ketika CPU atau Memory usage melampaui 80%
+
+### 9. Database
+Events disimpan menggunakan file `database.py`
+
+### 10. Deployment
 Project di deploy menggunakan docker compose sesuai pipeline pada JenkinsFile
 
 
