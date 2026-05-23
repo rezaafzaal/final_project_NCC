@@ -10,15 +10,6 @@
 
 SIEMalaman merupakan sistem SIEM (Security Information and Event Management) sederhana yang bertujuan untuk mengumpulkan, memproses, dan memonitor log sistem secara real-time. Sistem ini juga dilengkapi dengan fitur alerting dan dashboard monitoring untuk membantu analisis keamanan dan aktivitas sistem.
 
-## Arsitektur Sistem
-
-Sistem dibangun menggunakan pendekatan berbasis container menggunakan Docker dengan beberapa komponen utama:
-- Backend SIEM (FastAPI)
-- Frontend dashboard (web UI custom)
-- Prometheus (metrics collector)
-- Node Exporter (system metrics)
-- Grafana (visualisasi & alerting)
-
 Alur Data:
 1. Log dikumpulkan oleh log collector
 2. Log diparse oleh log parser
