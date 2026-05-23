@@ -1,4 +1,4 @@
-# SIEMbarangan
+# SIEMalaman
 
 | Nama | NRP |
 |---- |--- |
@@ -8,7 +8,7 @@
 
 ## Deskripsi Singkat
 
-SIEMbarangan merupakan sistem SIEM (Security Information and Event Management) sederhana yang bertujuan untuk mengumpulkan, memproses, dan memonitor log sistem secara real-time. Sistem ini juga dilengkapi dengan fitur alerting dan dashboard monitoring untuk membantu analisis keamanan dan aktivitas sistem.
+SIEMalaman merupakan sistem SIEM (Security Information and Event Management) sederhana yang bertujuan untuk mengumpulkan, memproses, dan memonitor log sistem secara real-time. Sistem ini juga dilengkapi dengan fitur alerting dan dashboard monitoring untuk membantu analisis keamanan dan aktivitas sistem.
 
 ## Arsitektur Sistem
 
