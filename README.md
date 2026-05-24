@@ -16,7 +16,7 @@ SIEMbarangan adalah sistem SIEM berbasis web yang mengumpulkan, menganalisis, da
 
 ```
 ┌────────────────────────────────────────────────────────┐
-│                    VPS (157.245.145.87)                │
+│                VPS (siembarangan.app)                  │
 │                                                        │
 │  ┌─────────────┐    ┌──────────────────────────────┐   │
 │  │   Browser   │    │      Docker: fp-siem         │   │
@@ -305,7 +305,7 @@ Rule ini trigger jika ada ≥5 failed login dari IP yang sama dalam 60 detik. Ra
 
 ## 7. API Endpoints
 
-Base URL: `http://157.245.145.87:8000/api`
+Base URL: `https://siembarangan.app/api`
 
 | Method | Endpoint               | Keterangan                                                      |
 | ------ | ---------------------- | --------------------------------------------------------------- |
