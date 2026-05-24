@@ -354,7 +354,128 @@ GET /api/events?limit=50&severity=CRITICAL&source=auth
 
 ---
 
-## 8. Prometheus Metrics
+## 8. Setup Domain, Nginx & SSL
+
+Aplikasi dapat diakses via domain **siembarangan.app** menggunakan Nginx sebagai reverse proxy dan Let's Encrypt untuk sertifikat SSL.
+
+### DNS Records (name.com)
+
+Konfigurasi DNS A Record pada domain registrar:
+
+| Type | Host       | Answer            | TTL |
+| ---- | ---------- | ----------------- | --- |
+| A    | *(kosong)* | `157.245.145.87`  | 300 |
+| A    | `www`      | `157.245.145.87`  | 300 |
+
+- **Host kosong** → mengarahkan `siembarangan.app` ke IP server
+- **Host www** → mengarahkan `www.siembarangan.app` ke IP server
+
+### Install Nginx & Certbot
+
+```bash
+sudo apt update
+sudo apt install nginx certbot python3-certbot-nginx -y
+```
+
+### Konfigurasi Nginx (`/etc/nginx/sites-available/default`)
+
+Nginx berfungsi sebagai reverse proxy dari port 80/443 ke aplikasi Docker di port 8000:
+
+```nginx
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    server_name siembarangan.app www.siembarangan.app;
+
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket support (untuk live events)
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+```
+
+> **Catatan:** Konfigurasi WebSocket (`Upgrade` dan `Connection` headers) diperlukan agar fitur **Live Events** via WebSocket (`/ws`) berfungsi melalui Nginx.
+
+### Aktifkan dan Test Nginx
+
+```bash
+sudo nginx -t                    # Validasi konfigurasi
+sudo systemctl reload nginx      # Reload tanpa downtime
+```
+
+### SSL Certificate (Let's Encrypt)
+
+Certbot otomatis mengubah konfigurasi Nginx untuk redirect HTTP → HTTPS:
+
+```bash
+sudo certbot --nginx -d siembarangan.app -d www.siembarangan.app
+```
+
+Certbot akan:
+1. Memverifikasi kepemilikan domain via HTTP challenge
+2. Menginstall sertifikat SSL
+3. Mengupdate konfigurasi Nginx untuk HTTPS (port 443)
+4. Menambahkan auto-redirect dari HTTP ke HTTPS
+
+### Verifikasi
+
+```bash
+# Cek DNS sudah propagasi
+dig siembarangan.app +short
+# Output: 157.245.145.87
+
+# Cek HTTPS
+curl -I https://siembarangan.app
+# Output: HTTP/2 200
+
+# Cek WebSocket
+curl -i -N \
+  -H "Connection: Upgrade" \
+  -H "Upgrade: websocket" \
+  -H "Sec-WebSocket-Version: 13" \
+  -H "Sec-WebSocket-Key: test" \
+  https://siembarangan.app/ws
+```
+
+### Renewal Otomatis
+
+Certbot secara otomatis memperpanjang sertifikat via systemd timer:
+
+```bash
+sudo systemctl status certbot.timer   # Cek status timer
+sudo certbot renew --dry-run           # Test renewal
+```
+
+### Arsitektur Setelah Setup Domain
+
+```
+                         Internet
+                            │
+                     siembarangan.app
+                            │
+                    ┌───────▼───────┐
+                    │   Nginx :443  │  ← SSL termination
+                    │   (HTTPS)     │
+                    └───────┬───────┘
+                            │ proxy_pass
+                    ┌───────▼───────┐
+                    │  Docker :8000 │  ← FastAPI + Static Files
+                    │   (fp-siem)   │
+                    └───────────────┘
+```
+
+---
+
+## 9. Prometheus Metrics
 
 Didefinisikan di `backend/app/metrics.py`. Tersedia di `GET /metrics`.
 
@@ -379,7 +500,7 @@ siem_active_websocket_connections
 
 ---
 
-## 9. Monitoring — Prometheus & Grafana
+## 10. Monitoring — Prometheus & Grafana
 
 ### Infrastruktur Monitoring
 
@@ -444,7 +565,7 @@ scrape_configs:
 
 ---
 
-## 10. CI/CD Pipeline — Jenkins
+## 11. CI/CD Pipeline — Jenkins
 
 Pipeline otomatis dijalankan setiap kali ada push ke GitHub (via GitHub webhook).
 
@@ -483,7 +604,7 @@ docker compose up -d --build
 
 ---
 
-## 11. Kualitas Kode — SonarQube
+## 12. Kualitas Kode — SonarQube
 
 ### Konfigurasi (`sonar-project.properties`)
 
