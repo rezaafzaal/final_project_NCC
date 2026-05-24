@@ -1,6 +1,6 @@
 # SIEMbarangan — Security Information and Event Management Dashboard
 
-**Kelompok 4 — Network and Cloud Computing (NCC) Final Project**
+**Kelompok 4 — Net-Centric Computing (NCC) Final Project**
 
 | Nama                       | NRP        |
 | -------------------------- | ---------- |
