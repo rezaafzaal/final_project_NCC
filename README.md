@@ -350,6 +350,8 @@ GET /api/events?limit=50&severity=CRITICAL&source=auth
 }
 ```
 
+<img width="1916" height="940" alt="image" src="https://github.com/user-attachments/assets/47b08244-3b2f-47d2-bcb0-8399c37fb7f5" />
+
 ---
 
 ## 8. Prometheus Metrics
@@ -420,6 +422,9 @@ scrape_configs:
 | CRITICAL Events              | Stat       | `sum(siem_events_total{severity="CRITICAL"})`          |
 | WARNING Events               | Stat       | `sum(siem_events_total{severity="WARNING"})`           |
 
+<img width="1918" height="948" alt="image" src="https://github.com/user-attachments/assets/d23df6cc-ef21-4db6-af23-ca3ab1e47b19" />
+
+
 ### Grafana Dashboard — System Resources (`monitoring/grafana/dashboards/system.json`)
 
 8 panel monitoring server (via Node Exporter):
@@ -434,6 +439,8 @@ scrape_configs:
 | Memory Usage  | Timeseries | `node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes`                 |
 | Disk Usage %  | Timeseries | `(1 - node_filesystem_avail_bytes/node_filesystem_size_bytes)*100`            |
 | Network I/O   | Timeseries | `rate(node_network_receive_bytes_total[1m])`                                  |
+
+<img width="1919" height="940" alt="image" src="https://github.com/user-attachments/assets/af404e4b-36d2-4360-acf3-913ebb42f7f0" />
 
 ---
 
@@ -471,6 +478,8 @@ docker compose up -d --build
 ### Credentials Jenkins
 
 - **`env file`** — Secret file berisi environment variables produksi (.env), di-inject saat stage Deploy
+
+<img width="1919" height="946" alt="image" src="https://github.com/user-attachments/assets/baf9135b-63ef-406c-a409-d30daa79de8b" />
 
 ---
 
@@ -521,17 +530,20 @@ Beberapa rule SonarQube yang menghasilkan false positive pada kode ini:
 
 ### File Test
 
-| File                    | Yang Ditest                                                            |
-| ----------------------- | ---------------------------------------------------------------------- |
-| `test_log_event.py`     | `LogEvent` dataclass, `to_dict()`                                      |
-| `test_log_generator.py` | Semua generator (\_random_auth, \_access, \_firewall, \_syslog, \_fim) |
-| `test_log_parser.py`    | Parser untuk setiap log format                                         |
-| `test_rule_engine.py`   | Evaluasi rule, rate detection, kondisi time_range, path_match          |
-| `test_metrics.py`       | Prometheus Counter dan Gauge                                           |
-| `test_email_service.py` | Email service (mocked SMTP)                                            |
+| File                      | Yang Ditest                                                            |
+| -----------------------   | ---------------------------------------------------------------------- |
+| `test_log_event.py`       | `LogEvent` dataclass, `to_dict()`                                      |
+| `test_log_generator.py`   | Semua generator (\_random_auth, \_access, \_firewall, \_syslog, \_fim) |
+| `test_log_parser.py`      | Parser untuk setiap log format                                         |
+| `test_rule_engine.py`     | Evaluasi rule, rate detection, kondisi time_range, path_match          |
+| `test_metrics.py`         | Prometheus Counter dan Gauge                                           |
+| `test_discord_webhook.py` | Discord alert                                                          |
 
 ### Coverage Target
 
 SonarQube Quality Gate mewajibkan **coverage ≥ 80%** pada new code. File infrastruktur (database, websocket, main, routes) dikecualikan dari coverage via `sonar.coverage.exclusions`.
+
+<img width="1919" height="885" alt="image" src="https://github.com/user-attachments/assets/c2f00c01-4c4e-4dfb-9913-0ee703113d60" />
+
 
 ---
