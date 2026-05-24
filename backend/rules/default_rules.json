@@ -138,22 +138,6 @@
       }
     },
     {
-      "rule_id": 4100,
-      "name": "firewall_drop_flood",
-      "description": "High volume of firewall drops from a single IP (port scan or attack)",
-      "severity": "CRITICAL",
-      "mitre_id": "T1046",
-      "mitre_tactic": "Discovery",
-      "conditions": {
-        "source": "firewall",
-        "action": "DROP",
-        "rate": {
-          "threshold": 20,
-          "window_seconds": 30
-        }
-      }
-    },
-    {
       "rule_id": 4101,
       "name": "firewall_drop_single",
       "description": "Firewall dropped an incoming connection",
@@ -176,6 +160,22 @@
         "source": "firewall",
         "action": "DROP",
         "direction": "outbound"
+      }
+    },
+    {
+      "rule_id": 4100,
+      "name": "firewall_drop_flood",
+      "description": "High volume of firewall drops from a single IP (port scan or attack)",
+      "severity": "CRITICAL",
+      "mitre_id": "T1046",
+      "mitre_tactic": "Discovery",
+      "conditions": {
+        "source": "firewall",
+        "action": "DROP",
+        "rate": {
+          "threshold": 20,
+          "window_seconds": 30
+        }
       }
     },
     {

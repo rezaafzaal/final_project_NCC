@@ -30,27 +30,41 @@ async def lifespan(app: FastAPI):
         )
 
     app.state.pipeline_task = asyncio.create_task(pipeline())
+
+    def _log_pipeline_error(task: asyncio.Task):
+        if not task.cancelled() and task.exception():
+            print(f"[PIPELINE] Fatal error: {task.exception()}")
+
+    app.state.pipeline_task.add_done_callback(_log_pipeline_error)
     try:
         yield
     finally:
         app.state.pipeline_task.cancel()
 
 
+_alert_tasks: set = set()
+
+
 async def _process_queue(queue: asyncio.Queue, rule_engine: RuleEngine):
     from app.api.websocket import manager
     while True:
         event = await queue.get()
-        event = rule_engine.evaluate(event)
-        await save_event(event.to_dict())
-        await manager.broadcast(event.to_dict())
+        try:
+            event = rule_engine.evaluate(event)
+            await save_event(event.to_dict())
+            await manager.broadcast(event.to_dict())
 
-        events_total.labels(severity=event.severity, source=event.source).inc()
+            events_total.labels(severity=event.severity, source=event.source).inc()
 
-        if event.rule_triggered:
-            rules_triggered_total.labels(rule=event.rule_triggered).inc()
+            if event.rule_triggered:
+                rules_triggered_total.labels(rule=event.rule_triggered).inc()
 
-        if event.severity == "CRITICAL":
-            _alert_task = asyncio.create_task(asyncio.to_thread(send_alert_dc, event))
+            if event.severity == "CRITICAL":
+                task = asyncio.create_task(asyncio.to_thread(send_alert_dc, event))
+                _alert_tasks.add(task)
+                task.add_done_callback(_alert_tasks.discard)
+        except Exception as exc:
+            print(f"[PIPELINE] Error processing event: {exc}")
 
 
 app = FastAPI(title="SIEM Dashboard", lifespan=lifespan)
