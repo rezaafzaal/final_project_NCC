@@ -61,31 +61,28 @@ SIEMbarangan adalah sistem SIEM berbasis web yang mengumpulkan, menganalisis, da
 
 ### Fitur Wajib
 
-| Fitur                        | Status | Keterangan                              |
-| ---------------------------- | ------ | --------------------------------------- |
-| Pengumpulan Log Multi-sumber | Done   | Auth, Access, Firewall, Syslog, FIM     |
-| Parsing & Normalisasi Log    | Done   | Log parser per source type              |
-| Rule-based Threat Detection  | Done   | 20 rules dengan MITRE ATT&CK mapping    |
-| Penyimpanan ke Database      | Done   | MySQL dengan connection pool            |
-| Real-time Dashboard          | Done   | WebSocket, Chart.js                     |
-| Visualisasi Statistik        | Done   | Severity distribution, Events over time |
-| Filter & Live Event Table    | Done   | Filter by severity dan source           |
+| Fitur | Keterangan |
+|-------|------------|
+| Pengumpulan Log Multi-sumber | Auth, Access, Firewall, Syslog, FIM |
+| Parsing & Normalisasi Log | Ekstrak IP, user, action, severity, timestamp per source |
+| Real-time Dashboard | WebSocket, Chart.js, severity distribution & events over time |
+| Rule-based Threat Detection | 20 rules dengan MITRE ATT&CK mapping |
+| Penyimpanan ke Database | MySQL dengan async connection pool |
+| CI/CD Pipeline | Jenkins: Test → SonarQube → Deploy otomatis |
+| Quality Gate SonarQube | Coverage ≥80%, 0 new issues |
+| Dapat Diakses Publik | www.siembarangan.app |
 
 ### Fitur Tambahan (Bonus)
 
-| Fitur                    | Status | Keterangan                                         |
-| ------------------------ | ------ | -------------------------------------------------- |
-| Log Simulasi (Generator) | Done   | Menghasilkan event realistis secara otomatis       |
-| Runtime Log Path Update  | Done   | Ganti path log file tanpa restart via UI           |
-| Discord Webhook Alerting | Done   | Kirim alert Discord saat event CRITICAL terdeteksi |
-| Prometheus Metrics       | Done   | 3 custom metrics dengan label                      |
-| Grafana Dashboard SIEM   | Done   | 7 panel monitoring SIEM metrics                    |
-| Grafana Dashboard System | Done   | 8 panel monitoring server resources                |
-| Node Exporter            | Done   | CPU, Memory, Disk, Network dari host               |
-| CI/CD Pipeline           | Done   | Jenkins: Test → SonarQube → Deploy                 |
-| Quality Gate SonarQube   | Done   | Coverage ≥80%, 0 new issues                        |
-| Pan/Zoom pada Chart      | Done   | chartjs-plugin-zoom pada timeline chart            |
-
+| Fitur | Keterangan |
+|-------|------------|
+| Custom Rule Engine | Berbasis konfigurasi JSON, hot-reload tanpa restart |
+| Severity Level | INFO, WARNING, CRITICAL pada setiap event |
+| Penyimpanan Event | MySQL dengan connection pool dan filter query |
+| Discord Webhook Alerting | Notifikasi otomatis saat event CRITICAL terdeteksi |
+| Runtime Log Path Update | Ganti path log file via dashboard tanpa restart |
+| Prometheus + Grafana | 3 custom metrics, 2 dashboard (SIEM + System resources) |
+| Node Exporter | Monitoring CPU, RAM, Disk, Network dari host |
 ---
 
 ## 3. Tech Stack
@@ -133,6 +130,12 @@ final_project/
 │   │   ├── config.py              # Environment variable config
 │   │   ├── main.py                # FastAPI app & lifespan pipeline
 │   │   └── metrics.py             # Prometheus metrics definitions
+│   ├── logs/
+│   │   ├── auth.log               # Auth log file 
+│   │   └── access.log             # Access log file 
+│   │   ├── firewall.log           # Firewall log file
+│   │   ├── syslog.log             # Syslog file
+│   │   └── fim.log                # FIM log file
 │   ├── rules/
 │   │   └── default_rules.json     # Rule definitions (20 rules)
 │   ├── tests/
